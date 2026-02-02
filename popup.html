@@ -1,17 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>Hallucination Detector</title>
-  <style>
-    body { width: 200px; padding: 10px; font-family: sans-serif; }
-    h1 { font-size: 16px; }
-    p { font-size: 12px; color: #666; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BanaScrape</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 320px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: 600;
+            background: linear-gradient(90deg, #10a37f, #4ade80);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .description {
+            font-size: 13px;
+            color: #a0aec0;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .status-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .platforms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .platform {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 163, 127, 0.1);
+            border: 1px solid rgba(16, 163, 127, 0.3);
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #10a37f;
+        }
+
+        .platform-dot {
+            width: 6px;
+            height: 6px;
+            background: #10a37f;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .accuracy {
+            margin-left: auto;
+            font-weight: 600;
+            color: #4ade80;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #4a5568;
+        }
+    </style>
 </head>
+
 <body>
-  <h1>AI Verifier</h1>
-  <p>Active on chatgpt.com & gemini.google.com</p>
-  <hr>
-  <p>Search Powered by Google</p>
+    <div class="header">
+        <img src="icons/logo.jpg" alt="BanaScrape" class="logo">
+        <h1>BanaScrape</h1>
+    </div>
+
+    <p class="description">
+        Hallucination detector for LLMs. Verify AI-generated claims using advanced analysis.
+        Click "Verify Claims" on any AI response to fact-check.
+    </p>
+
+    <div class="status-card">
+        <div class="status-label">Platform Accuracy Ratings</div>
+        <div class="platforms">
+            <div class="platform">
+                <span class="platform-dot" style="background: #cc785c;"></span>
+                Claude <span class="accuracy">88%</span>
+            </div>
+            <div class="platform">
+                <span class="platform-dot" style="background: #10a37f;"></span>
+                ChatGPT <span class="accuracy">85%</span>
+            </div>
+            <div class="platform">
+                <span class="platform-dot" style="background: #f55036;"></span>
+                Groq <span class="accuracy">82%</span>
+            </div>
+            <div class="platform">
+                <span class="platform-dot" style="background: #4285f4;"></span>
+                Gemini <span class="accuracy">80%</span>
+            </div>
+            <div class="platform">
+                <span class="platform-dot" style="background: #6366f1;"></span>
+                Qwen <span class="accuracy">75%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Powered by trusted sources verification
+    </div>
 </body>
+
 </html>

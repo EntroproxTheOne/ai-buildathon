@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AI Hallucination Detector",
+  "name": "BanaScrape",
   "version": "1.0",
-  "description": "Verify AI claims with real-time web search.",
+  "description": "Hallucination detector for LLMs - Verify AI claims with real-time analysis.",
   "permissions": [
     "activeTab",
     "scripting",
@@ -13,6 +13,8 @@
     "https://gemini.google.com/*",
     "https://chat.qwen.ai/*",
     "https://claude.ai/*",
+    "https://groq.com/*",
+    "https://api.groq.com/*",
     "https://www.google.com/search?q=*"
   ],
   "background": {
@@ -25,6 +27,7 @@
         "https://gemini.google.com/*",
         "https://chat.qwen.ai/*",
         "https://claude.ai/*",
+        "https://groq.com/*",
         "<all_urls>"
       ],
       "js": [
@@ -36,6 +39,16 @@
     }
   ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/logo.jpg",
+      "48": "icons/logo.jpg",
+      "128": "icons/logo.jpg"
+    }
+  },
+  "icons": {
+    "16": "icons/logo.jpg",
+    "48": "icons/logo.jpg",
+    "128": "icons/logo.jpg"
   }
 }

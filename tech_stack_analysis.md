@@ -1,31 +1,30 @@
 # Accuracy & AI Model Options
 
-## 1. Current Approach: "Live Search + Regex"
-*   **Accuracy**: High for **Numbers & Dates**. Low for **Reasoning**.
-*   **Pros**: Fast, Real-time news.
-*   **Cons**: Context-blind.
+## 1. Local NLI Models (Small, In-Browser)
+*   **Examples**: `distilbert-mnli`, `Xenova/nli-deberta-v3-xsmall`
+*   **Pros**:
+    *   ✅ **Free**: No API costs.
+    *   ✅ **Private**: Data never leaves the browser.
+    *   ✅ **Offline-ish**: Only needs internet for the Google Search part.
+*   **Cons**:
+    *   ❌ **"Dumber"**: Can only check "A vs B" logic. Can't reason about nuance (e.g., sarcasm, slight context shifts).
+    *   ❌ **Heavy Download**: Users download ~40-100MB model.
 
-## 2. Option A: Browser-Native AI (Transformers.js) 🚀 *Recommended for "Wow" factor*
-We can inject a **Tiny AI Model** directly into the extension.
+## 2. Trusted Cloud AI (The "Pro" Approach)
+*   **Examples**: GPT-4o, Gemini 1.5 Pro, Perplexity API.
+*   **Pros**:
+    *   ✅ **Smarter**: Can handle Noise Removal + Verification + Search in one go.
+    *   ✅ **Reasoning**: Understands context ("It was 1995" might be true in *some* context).
+    *   ✅ **Simple Code**: We just send the text and get a JSON result.
+*   **Cons**:
+    *   ❌ **Cost**: Requires an API Key (money).
+    *   ❌ **Latency**: Slower (needs to send data -> process -> return).
 
-### A. For Noise Removal (Classification)
-*   **Model**: `Xenova/distilbert-base-uncased` (Small, General)
-*   **Task**: "Is this sentence a fact?" (Yes/No)
+## 🏆 Recommendation: Hyper-Hybrid
+**Use Cloud AI (Gemini/OpenAI) for the best results.**
+If you want "Fast, Quick, and Easy Verification" that handles noise reduction automatically:
+1.  **Add an API Key Settings Page**: Let the user add their Gemini/OpenAI key.
+2.  **Send the Claim + Search Results** to the AI.
+3.  **Prompt**: "Verify this claim using these search snippets. Ignore if it's just chatty noise."
 
-### B. For Verification (NLI - Natural Language Inference) **<-- YOUR REQUEST**
-This is the "Magic" you are looking for.
-*   **Task**: Logic Checking (Entailment).
-    *   *Input*: Premise (Google Snippet) + Hypothesis (User Claim).
-    *   *Output*: "Contradiction", "Neutral", or "Entailment".
-*   **Recommended Model**: `Xenova/distilbert-base-uncased-mnli`
-    *   **Size**: ~67 MB (Quantized).
-    *   **Accuracy**: Very good at spotting contradictions (e.g., "Launched in 2021" vs "Launched in 1995").
-    *   **Speed**: Runs locally in browser (WebGPU/WASM) in milliseconds.
-
-## 3. Option B: Specialized Check-Model (RAG API)
-*   **Pros**: Smarter.
-*   **Cons**: Expensive, slower.
-
-## 🎨 Logo & Icons
-**YES!** Please work on the logo.
-*   **Needs**: `icon16.png`, `icon48.png`, `icon128.png`.
+This gives you the power of GPTZero-level detection without building a massive local system.

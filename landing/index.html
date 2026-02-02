@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BanaScrape - Hallucination Detector for LLMs</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cyber-yellow: #f0e130;
+            --cyber-pink: #ff2a6d;
+            --cyber-blue: #05d9e8;
+            --cyber-purple: #7b2cbf;
+            --dark-bg: #0a0a12;
+            --dark-card: #12121a;
+            --grid-color: rgba(5, 217, 232, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Cyber Grid Background */
+        .cyber-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px) 0 0 / 50px 50px,
+                linear-gradient(var(--grid-color) 1px, transparent 1px) 0 0 / 50px 50px,
+                radial-gradient(ellipse at 50% 0%, rgba(123, 44, 191, 0.3) 0%, transparent 60%),
+                var(--dark-bg);
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                background-position: 0 0, 0 0, 50% 0%, 0 0;
+            }
+
+            100% {
+                background-position: 50px 50px, 50px 50px, 50% 0%, 0 0;
+            }
+        }
+
+        /* Glowing Lines */
+        .glow-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 18, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(5, 217, 232, 0.2);
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-container img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--cyber-yellow), var(--cyber-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #a0a0a0;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--cyber-blue);
+            text-shadow: 0 0 20px var(--cyber-blue);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, var(--cyber-yellow), #d4c42a);
+            color: #000;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(240, 225, 48, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 60px 60px;
+            position: relative;
+        }
+
+        .hero-content {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(5, 217, 232, 0.1);
+            border: 1px solid var(--cyber-blue);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--cyber-blue);
+            margin-bottom: 24px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(5, 217, 232, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 20px 5px rgba(5, 217, 232, 0.2);
+            }
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(90deg, var(--cyber-yellow), var(--cyber-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #a0a0a0;
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyber-yellow), #d4c42a);
+            color: #000;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(240, 225, 48, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            padding: 16px 32px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--cyber-blue);
+            color: var(--cyber-blue);
+        }
+
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-image {
+            max-width: 500px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 0 60px rgba(5, 217, 232, 0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Stats Section */
+        .stats {
+            display: flex;
+            gap: 60px;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            color: var(--cyber-yellow);
+            margin-bottom: 8px;
+        }
+
+        .stat-item p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: 100px 60px;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 42px;
+            margin-bottom: 16px;
+        }
+
+        .section-header h2 span {
+            color: var(--cyber-blue);
+        }
+
+        .section-header p {
+            color: #888;
+            font-size: 18px;
+        }
+
+        /* Demo Container */
+        .demo-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--dark-card);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .browser-bar {
+            background: #1a1a24;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .browser-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .browser-dots span:nth-child(1) {
+            background: #ff5f56;
+        }
+
+        .browser-dots span:nth-child(2) {
+            background: #ffbd2e;
+        }
+
+        .browser-dots span:nth-child(3) {
+            background: #27ca40;
+        }
+
+        .browser-url {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .demo-content {
+            padding: 30px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Fake AI Chat */
+        .ai-chat {
+            background: #1e1e2a;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .ai-message {
+            margin-bottom: 20px;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .ai-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--cyber-purple), var(--cyber-pink));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .ai-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .ai-text {
+            color: #d0d0d0;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .ai-text .claim {
+            background: rgba(255, 42, 109, 0.1);
+            border-bottom: 2px dashed var(--cyber-pink);
+            padding: 0 4px;
+        }
+
+        .ai-text .claim.verified {
+            background: rgba(39, 202, 64, 0.1);
+            border-bottom-color: #27ca40;
+        }
+
+        /* BanaScrape Results */
+        .banascrape-results {
+            margin-top: 20px;
+            background: linear-gradient(135deg, rgba(240, 225, 48, 0.05), rgba(5, 217, 232, 0.05));
+            border: 1px solid rgba(240, 225, 48, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-header img {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        .results-header h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: var(--cyber-yellow);
+        }
+
+        .accuracy-badge {
+            margin-left: auto;
+            background: rgba(5, 217, 232, 0.2);
+            color: var(--cyber-blue);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .claim-result {
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--cyber-blue);
+        }
+
+        .claim-result.warning {
+            border-left-color: var(--cyber-pink);
+        }
+
+        .claim-result.success {
+            border-left-color: #27ca40;
+        }
+
+        .claim-text {
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .claim-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .claim-status.verified {
+            color: #27ca40;
+        }
+
+        .claim-status.unverified {
+            color: var(--cyber-pink);
+        }
+
+        .confidence {
+            margin-left: auto;
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 60px;
+            background: linear-gradient(180deg, transparent, rgba(5, 217, 232, 0.02));
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--dark-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--cyber-blue);
+            box-shadow: 0 20px 60px rgba(5, 217, 232, 0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--cyber-yellow), var(--cyber-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 100px 60px;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta-box {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(240, 225, 48, 0.1), rgba(123, 44, 191, 0.1));
+            border: 1px solid rgba(240, 225, 48, 0.3);
+            border-radius: 24px;
+            padding: 60px;
+        }
+
+        .cta h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .cta p {
+            color: #888;
+            font-size: 18px;
+            margin-bottom: 32px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                padding: 100px 20px 40px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                padding: 16px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cyber-bg"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo-container">
+            <img src="logo.jpg" alt="BanaScrape">
+            <span class="logo-text">BanaScrape</span>
+        </div>
+        <div class="nav-links">
+            <a href="#demo">Demo</a>
+            <a href="#features">Features</a>
+            <a href="https://github.com" target="_blank">GitHub</a>
+        </div>
+        <a href="#download" class="download-btn">⬇ Download Extension</a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">🍌 AI Fact-Checking Made Easy</span>
+            <h1>Detect LLM <span>Hallucinations</span> Instantly</h1>
+            <p>BanaScrape analyzes AI-generated content in real-time, verifying claims against trusted sources. Never be
+                fooled by AI hallucinations again.</p>
+
+            <div class="hero-buttons">
+                <button class="btn-primary"
+                    onclick="document.getElementById('download').scrollIntoView({behavior: 'smooth'})">
+                    🔍 Get BanaScrape Free
+                </button>
+                <button class="btn-secondary"
+                    onclick="document.getElementById('demo').scrollIntoView({behavior: 'smooth'})">
+                    Watch Demo
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <h3>5+</h3>
+                    <p>AI Platforms Supported</p>
+                </div>
+                <div class="stat-item">
+                    <h3>85%</h3>
+                    <p>Avg Detection Accuracy</p>
+                </div>
+                <div class="stat-item">
+                    <h3>100%</h3>
+                    <p>Free & Open Source</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <img src="hero-banner.png" alt="BanaScrape Demo" class="hero-image">
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section" id="demo">
+        <div class="section-header">
+            <h2>See <span>BanaScrape</span> in Action</h2>
+            <p>Watch how BanaScrape detects hallucinations in real-time</p>
+        </div>
+
+        <div class="demo-container">
+            <div class="browser-bar">
+                <div class="browser-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="browser-url">🔒 chatgpt.com</div>
+            </div>
+
+            <div class="demo-content">
+                <div class="ai-chat">
+                    <div class="ai-message">
+                        <div class="ai-header">
+                            <div class="ai-avatar">🤖</div>
+                            <span class="ai-name">ChatGPT</span>
+                        </div>
+                        <div class="ai-text">
+                            <p>Here are some facts about the Eiffel Tower:</p>
+                            <br>
+                            <p>• The Eiffel Tower was completed in <span class="claim verified">1889</span> for the
+                                World's Fair.</p>
+                            <p>• It stands at <span class="claim verified">330 meters</span> tall, making it the tallest
+                                structure in Paris.</p>
+                            <p>• The tower was designed by <span class="claim verified">Gustave Eiffel</span>'s
+                                engineering company.</p>
+                            <p>• It receives approximately <span class="claim">15 million visitors</span> annually.</p>
+                            <p>• The tower was originally painted <span class="claim">bright red</span> when first
+                                constructed.</p>
+                        </div>
+                    </div>
+
+                    <!-- BanaScrape Results -->
+                    <div class="banascrape-results">
+                        <div class="results-header">
+                            <img src="logo.jpg" alt="BanaScrape">
+                            <h4>BanaScrape Verification Results</h4>
+                            <span class="accuracy-badge">📊 ChatGPT: 85% Accuracy</span>
+                        </div>
+
+                        <div class="claim-result success">
+                            <div class="claim-text">"The Eiffel Tower was completed in 1889..."</div>
+                            <div class="claim-status verified">
+                                ✅ Verified
+                                <span class="confidence">(92% confidence) - Advanced Analysis</span>
+                            </div>
+                        </div>
+
+                        <div class="claim-result success">
+                            <div class="claim-text">"It stands at 330 meters tall..."</div>
+                            <div class="claim-status verified">
+                                ✅ Verified
+                                <span class="confidence">(89% confidence) - Advanced Analysis</span>
+                            </div>
+                        </div>
+
+                        <div class="claim-result success">
+                            <div class="claim-text">"Designed by Gustave Eiffel's engineering company..."</div>
+                            <div class="claim-status verified">
+                                ✅ Verified
+                                <span class="confidence">(95% confidence) - Advanced Analysis</span>
+                            </div>
+                        </div>
+
+                        <div class="claim-result warning">
+                            <div class="claim-text">"It receives approximately 15 million visitors annually..."</div>
+                            <div class="claim-status unverified">
+                                ⚠️ Unverified - Actual figure is ~7 million
+                                <span class="confidence">(45% confidence)</span>
+                            </div>
+                        </div>
+
+                        <div class="claim-result warning">
+                            <div class="claim-text">"Originally painted bright red..."</div>
+                            <div class="claim-status unverified">
+                                ⚠️ Unverified - Was painted "Venetian Red"
+                                <span class="confidence">(38% confidence)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Why Choose <span>BanaScrape</span>?</h2>
+            <p>Advanced AI fact-checking at your fingertips</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Real-Time Detection</h3>
+                <p>Instantly verify claims as you chat with any AI. No copy-pasting required.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔗</div>
+                <h3>Multi-Platform</h3>
+                <p>Works with ChatGPT, Gemini, Claude, Qwen, Groq and more AI platforms.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Accuracy Ratings</h3>
+                <p>See each AI platform's reliability score based on hallucination research.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Trusted Sources</h3>
+                <p>Cross-references claims with academic, government, and news sources.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Lightning Fast</h3>
+                <p>Advanced analysis powered by cutting-edge verification technology.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🆓</div>
+                <h3>100% Free</h3>
+                <p>Open source and completely free. No subscriptions, no hidden costs.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="download">
+        <div class="cta-box">
+            <h2>🍌 Ready to Scrape the Truth?</h2>
+            <p>Download BanaScrape now and never fall for AI hallucinations again</p>
+            <button class="btn-primary" style="margin: 0 auto;">
+                ⬇ Download for Chrome (Free)
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 BanaScrape - Hallucination Detector for LLMs. Built with 🍌 and ☕</p>
+    </footer>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add floating animation to demo results
+        const results = document.querySelector('.banascrape-results');
+        let isVisible = false;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !isVisible) {
+                    isVisible = true;
+                    results.style.animation = 'slideIn 0.8s ease-out forwards';
+                }
+            });
+        }, { threshold: 0.5 });
+
+        observer.observe(results);
+    </script>
+</body>
+
+</html>
