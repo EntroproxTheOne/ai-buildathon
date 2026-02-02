@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "AI Hallucination Detector",
+  "version": "1.0",
+  "description": "Verify AI claims with real-time web search.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://gemini.google.com/*",
+    "https://chat.qwen.ai/*",
+    "https://claude.ai/*",
+    "https://www.google.com/search?q=*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://gemini.google.com/*",
+        "https://chat.qwen.ai/*",
+        "https://claude.ai/*",
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

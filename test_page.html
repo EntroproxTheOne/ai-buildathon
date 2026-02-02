@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Hallucination Detector Test Page</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #343541;
+            color: white;
+            padding: 50px;
+        }
+
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .message {
+            padding: 20px;
+            border-bottom: 1px solid #555;
+        }
+
+        .user {
+            background: #343541;
+        }
+
+        .assistant {
+            background: #444654;
+        }
+
+        /* Mimic ChatGPT Classes */
+        .markdown {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .mock-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            color: black;
+            padding: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mock-controls">
+        <h3>Test Controls</h3>
+        <button onclick="addHallucination()">Simulate New AI Message</button>
+    </div>
+
+    <div class="chat-container">
+        <div class="message user">
+            <div class="markdown">When is India's Republic Day?</div>
+        </div>
+
+        <div class="message assistant">
+            <div class="markdown">India's Republic Day is celebrated on August 15th every year to honor the
+                Constitution.</div>
+        </div>
+    </div>
+
+    <script>
+        function addHallucination() {
+            const container = document.querySelector('.chat-container');
+
+            // Create Mock Response
+            const msg = document.createElement('div');
+            msg.className = 'message assistant';
+            msg.innerHTML = `
+                <div class="markdown">
+                    The James Webb Space Telescope was launched in 1995.
+                    (Note: This is false, it was 2021).
+                </div>
+            `;
+
+            container.appendChild(msg);
+        }
+    </script>
+</body>
+
+</html>
